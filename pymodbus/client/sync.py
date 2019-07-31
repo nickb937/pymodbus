@@ -241,11 +241,11 @@ class ModbusTcpClient(BaseModbusClient):
         self.socket.setblocking(0)
         begin = time.time()
 
-        data = []
+        data = b''
         if size is not None:
             while len(data) < size:
                 try:
-                    data.append(self.socket.recv(size - len(data)))
+                    data += self.socket.recv(size - len(data))
                 except socket.error:
                     pass
                 if not self.timeout or (time.time() - begin > self.timeout):
@@ -253,12 +253,12 @@ class ModbusTcpClient(BaseModbusClient):
         else:
             while True:
                 try:
-                    data.append(self.socket.recv(1))
+                    data += self.socket.recv(1)
                 except socket.error:
                     pass
                 if not self.timeout or (time.time() - begin > self.timeout):
                     break
-        return b''.join(data)
+        return data
 
     def is_socket_open(self):
         return True if self.socket is not None else False
